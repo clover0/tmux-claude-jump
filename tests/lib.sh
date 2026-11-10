@@ -12,6 +12,10 @@ FIXTURES_DIR="$TESTS_DIR/fixtures"
 # Run the plugin scripts with this bash (e.g. TEST_BASH=/bin/bash for 3.2).
 TEST_BASH=${TEST_BASH:-$(command -v bash)}
 
+# Non-ASCII test data, built from UTF-8 bytes so the sources stay ASCII.
+WIDE_CHAR=$(printf '\345\255\227')       # U+5B57, a double-width CJK character
+FULLWIDTH_SPACE=$(printf '\343\200\200') # U+3000, IDEOGRAPHIC SPACE
+
 PASSED=0
 FAILED=0
 SKIPPED=0

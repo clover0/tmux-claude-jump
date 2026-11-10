@@ -12,10 +12,10 @@ The plugin doesn't replace anything in Claude Code. It reads Claude Code's local
 Claude Sessions>
   4/4 ──────────────────────────────────────────────────────────────────────
   Enter: Jump to project  Ctrl-O: Open session in new window  Esc: Cancel
-▌ 11/11 07:17  my-app                認証機能のリファクタリング            ··
-  11/11 04:14  backend               APIエラーハンドリングの改善           ··
-  11/10 04:20  my-app                テストコードの追加                    ··
-  11/09 03:20  website               UIコンポーネントの修正                ··
+▌ 11/11 07:17  my-app                Refactor the authentication module    ··
+  11/11 04:14  backend               Improve API error handling            ··
+  11/10 04:20  my-app                Add test code                         ··
+  11/09 03:20  website               Fix the UI components                 ··
 
 ╭──────────────────────────────────────────────────────────────────────────╮
 │ Project:  /Users/me/src/my-app                                           │
@@ -23,8 +23,8 @@ Claude Sessions>
 │ Updated:  2026-11-11 07:17                                               │
 │ Prompts:  2                                                              │
 │                                                                          │
-│ 11/11 07:07  認証機能のリファクタリング                                  │
-│ 11/11 07:17  トークンの有効期限も見直して                                │
+│ 11/11 07:07  Refactor the authentication module                          │
+│ 11/11 07:17  Also review the token expiry                                │
 ╰──────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -55,10 +55,10 @@ tmux -V
 
 ## Installation with TPM
 
-Add the plugin to `~/.tmux.conf`, before the line that initializes TPM. Replace `<owner>` with the GitHub account that hosts this repository:
+Add the plugin to `~/.tmux.conf`, before the line that initializes TPM:
 
 ```tmux
-set -g @plugin '<owner>/tmux-claude-jump'
+set -g @plugin 'clover0/tmux-claude-jump'
 
 run '~/.tmux/plugins/tpm/tpm'
 ```
@@ -72,7 +72,7 @@ To uninstall, remove the `@plugin` line and press `prefix + alt + u`. The key bi
 Clone or copy this repository anywhere, for example:
 
 ```bash
-git clone <repository-url> ~/.tmux/plugins/tmux-claude-jump
+git clone https://github.com/clover0/tmux-claude-jump.git ~/.tmux/plugins/tmux-claude-jump
 ```
 
 Then load it from `~/.tmux.conf`:

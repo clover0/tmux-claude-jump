@@ -44,8 +44,8 @@ assert_eq "every line has three tab-separated fields" "" \
 test_case "aggregates entries of the same session"
 ROW_A=$(printf '%s\n' "$LIST" | awk -F '\t' -v s="$SID_A" '$1 == s && $2 == "/work/my-app"')
 assert_eq "one row for project + session" 1 "$(printf '%s\n' "$ROW_A" | wc -l | tr -d ' ')"
-assert_contains "all prompts are searchable" "認証機能のリファクタリング | /login | JWTの有効期限も見直して" "$ROW_A"
-assert_contains "first non-command prompt is the title" "my-app                認証機能のリファクタリング" "$ROW_A"
+assert_contains "all prompts are searchable" "Refactor the authentication module | /login | Also review the JWT expiry" "$ROW_A"
+assert_contains "first non-command prompt is the title" "my-app                Refactor the authentication module" "$ROW_A"
 assert_contains "shows the latest timestamp" "11/10 14:30" "$ROW_A"
 assert_eq "same session ID in another project is kept apart" "/work/other" \
   "$(printf '%s\n' "$LIST" | awk -F '\t' -v s="$SID_A" '$1 == s && $2 != "/work/my-app" {print $2}')"
@@ -59,7 +59,7 @@ assert_eq "session order" "$SID_A $SID_B $SID_C $SID_D $SID_A $SID_F" \
   "$(printf '%s\n' "$LIST" | cut -f1 | tr '\n' ' ' | sed 's/ $//')"
 
 test_case "searches across projects"
-assert_eq "by prompt" "$SID_B" "$(field "$(search "$LIST" "エラーハンドリング")" 1)"
+assert_eq "by prompt" "$SID_B" "$(field "$(search "$LIST" "error handling")" 1)"
 assert_eq "by a later prompt of a session" "$SID_A" "$(field "$(search "$LIST" "JWT")" 1)"
 assert_eq "by project name" "$SID_A $SID_C" \
   "$(search "$LIST" "my-app" | cut -f1 | tr '\n' ' ' | sed 's/ $//')"
@@ -85,7 +85,7 @@ ROW_D=$(printf '%s\n' "$LIST" | awk -F '\t' -v s="$SID_D" '$1 == s')
 assert_contains "newline, tab and control characters become spaces" "line1 line2 TAB ctl" "$ROW_D"
 # shellcheck disable=SC2016  # literal shell syntax is the point
 assert_contains "shell syntax is kept as plain text" '$(touch /tmp/cj-pwned) `id`; rm -rf ~' "$ROW_D"
-assert_contains "Japanese text is kept" "日本語　全角" "$ROW_D"
+assert_contains "wide characters are kept" "wide ${WIDE_CHAR}${FULLWIDTH_SPACE}${WIDE_CHAR} chars" "$ROW_D"
 assert_eq "no control characters in output" "" "$(printf '%s\n' "$LIST" | tr -d '\t\n' | LC_ALL=C tr -d '\040-\176\200-\377')"
 if [ -e /tmp/cj-pwned ]; then
   fail "prompt text must never be executed"
@@ -94,11 +94,11 @@ else
 fi
 LONG="$TMP/long"
 LONG_PROMPT=""
-for _ in 1 2 3 4 5 6 7 8 9 10; do LONG_PROMPT="${LONG_PROMPT}長い長い長い長い長い"; done
+for _ in 1 2 3 4 5 6 7 8 9 10; do LONG_PROMPT="${LONG_PROMPT}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}${WIDE_CHAR}"; done
 mkdir -p "$LONG"
 printf '{"display":"%s","timestamp":1,"project":"/p","sessionId":"long-1"}\n' "$LONG_PROMPT" >"$LONG/history.jsonl"
 LONG_ROW=$(CLAUDE_CONFIG_DIR=$LONG "$TEST_BASH" "$SCRIPTS_DIR/sessions.sh" list)
-assert_contains "long titles are truncated to the column width" "長…  " "$LONG_ROW"
+assert_contains "long titles are truncated to the column width" "${WIDE_CHAR}…  " "$LONG_ROW"
 assert_contains "the full prompt stays searchable" "$LONG_PROMPT" "$LONG_ROW"
 
 test_case "handles project paths with spaces"
@@ -135,7 +135,7 @@ PREVIEW=$(sessions preview "$SID_A" /work/my-app)
 assert_contains "project" "Project:  /work/my-app" "$PREVIEW"
 assert_contains "session" "Session:  $SID_A" "$PREVIEW"
 assert_contains "prompt count" "Prompts:  3" "$PREVIEW"
-assert_contains "prompts in order" "11/10 12:00  認証機能のリファクタリング" "$PREVIEW"
+assert_contains "prompts in order" "11/10 12:00  Refactor the authentication module" "$PREVIEW"
 assert_not_contains "other project with the same ID is excluded" "same id, other project" "$PREVIEW"
 assert_contains "warns about a missing directory" "no longer exists" "$PREVIEW"
 

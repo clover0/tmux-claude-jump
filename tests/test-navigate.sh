@@ -47,7 +47,7 @@ export PATH="$TMP/bin:$PATH"
 
 PROJ="$TMP/projects"
 ALPHA="$PROJ/alpha"
-SPECIAL="$PROJ/スペース dir #1"
+SPECIAL="$PROJ/dir with spaces #1 $WIDE_CHAR"
 mkdir -p "$ALPHA/sub" "$PROJ/alpha-other" "$PROJ/beta" "$PROJ/base" "$SPECIAL"
 ln -s "$ALPHA" "$TMP/alpha-link"
 
@@ -177,9 +177,9 @@ assert_eq "windows in other tmux sessions do not match" 1 "$?"
 test_case "sets the project directory for special paths"
 S=$(new_session t-special)
 W=$(nav open "$S" "$SPECIAL")
-assert_eq "path with spaces, Japanese and #" "$SPECIAL" "$(pane_path "$W")"
+assert_eq "path with spaces, wide characters and #" "$SPECIAL" "$(pane_path "$W")"
 assert_eq "tag keeps the exact path" "$SPECIAL" "$(window_option "$W" @claude_jump_project)"
-assert_eq "window name keeps #" "スペース dir #1" "$(tm display-message -p -t "$W" '#{window_name}')"
+assert_eq "window name keeps # and wide characters" "dir with spaces #1 $WIDE_CHAR" "$(tm display-message -p -t "$W" '#{window_name}')"
 assert_eq "found again by path" "$W" "$(nav find "$S" "$SPECIAL")"
 W2=$(nav open "$S" "$TMP/alpha-link")
 assert_eq "symlinked project opens the real directory" "$ALPHA" "$(window_option "$W2" @claude_jump_project)"
