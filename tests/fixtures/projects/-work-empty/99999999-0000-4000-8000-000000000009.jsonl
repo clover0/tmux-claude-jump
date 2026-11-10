@@ -1,0 +1,2 @@
+{"type":"user","cwd":"/work/empty","sessionId":"99999999-0000-4000-8000-000000000009","timestamp":"2024-11-11T11:11:00.000Z","message":{"role":"user","content":[{"tool_use_id":"toolu_9","type":"tool_result","content":"orphan tool output"}]}}
+{"type":"user","cwd":"/work/empty","sessionId":"99999999-0000-4000-8000-000000000009","timestamp":"2024-11-11T11:11:01.000Z","isMeta":true,"message":{"role":"user","content":"meta only"}}

@@ -2,9 +2,9 @@
 
 A tmux plugin for moving between projects and Claude Code conversations.
 
-Press `prefix + y` to search all of your past Claude Code sessions with fzf, across every project. Pick one, and the plugin takes you to that project's tmux window. If the project has no window yet, it creates one and resumes the conversation with `claude --resume`.
+Press `prefix + y` to search all of your past Claude Code sessions with fzf, across every project, whether they were started from the CLI or the Claude desktop app. Pick one, and the plugin takes you to that project's tmux window. If the project has no window yet, it creates one and resumes the conversation with `claude --resume`.
 
-The plugin doesn't replace anything in Claude Code. It reads Claude Code's local history (read-only) and only adds a key binding to tmux.
+The plugin doesn't replace anything in Claude Code. It reads Claude Code's local conversation files (read-only) and only adds a key binding to tmux.
 
 ## Preview
 
@@ -18,6 +18,7 @@ Claude Sessions>
   11/09 03:20  website               Fix the UI components                 ··
 
 ╭──────────────────────────────────────────────────────────────────────────╮
+│ Title:    Refactor the authentication module                             │
 │ Project:  /Users/me/src/my-app                                           │
 │ Session:  5f0c2a9e-0000-4000-8000-000000000001                           │
 │ Updated:  2026-11-11 07:17                                               │
@@ -28,7 +29,9 @@ Claude Sessions>
 ╰──────────────────────────────────────────────────────────────────────────╯
 ```
 
-Each row is one conversation: last update time, project name, and the first prompt that isn't a slash command. The search also covers the project's absolute path, the session ID, and every prompt in the conversation.
+Each row is one conversation: last activity time, project name, and title. The title is the one Claude Code shows: the title you gave the session, otherwise the generated one, otherwise the first prompt that isn't a slash command. The search also covers the project's absolute path, the session ID, and every prompt you typed in the conversation.
+
+Sessions are read from Claude Code's conversation files, `~/.claude/projects/<encoded-project-dir>/<session-id>.jsonl`, which the CLI and the desktop app both write. Only prompts a person typed are listed: tool results, injected system messages and subagent conversations are left out. The project directory is the one Claude Code stored the conversation under, which is where `claude --resume` has to run to find it.
 
 ## Requirements
 
@@ -157,7 +160,7 @@ When a conversation can no longer be found (no `projects/*/<session-id>.jsonl` u
 
 ## Running the tests
 
-The tests use dummy history in `tests/fixtures` and a private tmux server (`tmux -L` with its own `TMUX_TMPDIR`). They don't read your Claude history and don't touch the tmux server you're running. A stub replaces `claude`, so no real session is resumed.
+The tests use dummy conversation files in `tests/fixtures` and a private tmux server (`tmux -L` with its own `TMUX_TMPDIR`). They don't read your Claude Code data and don't touch the tmux server you're running. A stub replaces `claude`, so no real session is resumed.
 
 ```bash
 tests/run.sh
@@ -182,10 +185,11 @@ shellcheck -x claude-jump.tmux scripts/*.sh tests/*.sh
 - Only windows of the current tmux session are considered. Jumping across tmux sessions isn't supported.
 - Clients attached to the same tmux session share its current window, so switching windows also changes what those clients show. Clients on other tmux sessions aren't affected.
 - The plugin doesn't know whether Claude Code is running in a window. It matches by directory only.
-- History entries without a `sessionId` (written by old Claude Code versions) can't be resumed and are skipped.
+- Only conversations whose files still exist are listed. Claude Code deletes old conversation files (after 30 days by default, see `cleanupPeriodDays`), and those sessions disappear from the list.
+- All conversation files are read each time the popup opens. With about 160 MB of data this takes 1 to 1.5 seconds on an Apple silicon Mac.
 - fzf can't search hidden fields. So the path, session ID and other prompts sit at the end of each row, past the visible width, and matches there aren't highlighted. On a popup wider than about 400 columns they become visible.
 - Column alignment estimates character width, so some characters (combining marks, some emoji) can shift columns slightly.
-- Claude Code's local data format isn't a public interface and may change. All format-specific code lives in `scripts/sessions.sh`. If the `projects/` directory is missing, the check for deleted conversations is skipped and `claude` reports the error instead.
+- Claude Code's local data format isn't a public interface and may change. All format-specific code lives in `scripts/sessions.sh`.
 - Resumed windows run `claude` directly, not through your interactive shell, so shell aliases or functions named `claude` aren't used. `default-command` isn't applied to the shell that starts after Claude Code exits.
 - On case-insensitive file systems, paths that differ only in letter case aren't treated as the same.
 
@@ -204,10 +208,10 @@ tmux show-environment -g PATH
 tmux set-environment -g PATH "$PATH"
 ```
 
-"Claude Code history not found". Make sure the history file exists and that `CLAUDE_CONFIG_DIR` is set in tmux if you use a custom location:
+"Claude Code session data not found". Make sure the conversation directory exists and that `CLAUDE_CONFIG_DIR` is set in tmux if you use a custom location:
 
 ```bash
-ls ~/.claude/history.jsonl
+ls ~/.claude/projects
 tmux show-environment -g CLAUDE_CONFIG_DIR
 ```
 
@@ -218,7 +222,7 @@ brew upgrade tmux
 tmux kill-server
 ```
 
-The list is empty or looks wrong. Run the history reader directly. This prints your prompts to the terminal:
+The list is empty or looks wrong. Run the session reader directly. This prints your prompts to the terminal:
 
 ```bash
 ~/.tmux/plugins/tmux-claude-jump/scripts/sessions.sh list | cut -f1,2 | head

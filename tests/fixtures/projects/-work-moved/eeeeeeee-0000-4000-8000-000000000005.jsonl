@@ -1,0 +1,2 @@
+{"type":"user","cwd":"/work/old-worktree","sessionId":"eeeeeeee-0000-4000-8000-000000000005","timestamp":"2024-11-05T09:00:00.000Z","message":{"role":"user","content":"Continue the migration"}}
+{"type":"relocated","relocatedCwd":"/work/moved","sessionId":"eeeeeeee-0000-4000-8000-000000000005"}

@@ -1,0 +1,2 @@
+{"type":"user","cwd":"/work/my-app/tests","sessionId":"cccccccc-0000-4000-8000-000000000003","timestamp":"2024-11-09T10:00:00.000Z","message":{"role":"user","content":"Add test code"}}
+{"type":"user","cwd":"/work/my-app","sessionId":"cccccccc-0000-4000-8000-000000000003","timestamp":"2024-11-09T11:00:00.000Z","message":{"role":"user","content":"Run the tests"}}

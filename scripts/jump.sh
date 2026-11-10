@@ -22,7 +22,7 @@ SESSIONS="$CJ_SCRIPTS_DIR/sessions.sh"
 NAVIGATE="$CJ_SCRIPTS_DIR/navigate.sh"
 
 open_popup() {
-  local client=$1 session=$2 missing width height command
+  local client=$1 session=$2 missing data_dir width height command
   missing=$(cj_missing_commands fzf jq)
   if [ -n "$missing" ]; then
     cj_message "$client" "missing required command(s): $missing (brew install $missing)"
@@ -32,8 +32,9 @@ open_popup() {
     cj_message "$client" "tmux ${CJ_MIN_TMUX_MAJOR}.${CJ_MIN_TMUX_MINOR} or later is required ($(tmux -V))"
     return 1
   fi
-  if [ ! -e "$("$BASH" "$SESSIONS" history-file)" ]; then
-    cj_message "$client" "Claude Code history not found: $("$BASH" "$SESSIONS" history-file)"
+  data_dir=$("$BASH" "$SESSIONS" data-dir)
+  if [ ! -d "$data_dir" ]; then
+    cj_message "$client" "Claude Code session data not found: $data_dir"
     return 1
   fi
 

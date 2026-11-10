@@ -40,6 +40,10 @@ if [ -n "${CJ_TEST_FZF_EXIT:-}" ]; then
   exit "$CJ_TEST_FZF_EXIT"
 fi
 line=$(grep -F -- "$CJ_TEST_PICK" | head -n 1)
+# Simulate a conversation deleted while the picker is open.
+if [ -n "${CJ_TEST_DELETE:-}" ]; then
+  rm -f -- "$CJ_TEST_DELETE"
+fi
 printf '%s\n%s\n' "${CJ_TEST_KEY:-}" "$line"
 EOF
 chmod +x "$TMP/bin/claude" "$TMP/fzf-bin/fzf"
@@ -55,19 +59,33 @@ SID_ALPHA=11111111-0000-4000-8000-000000000001
 SID_BETA=22222222-0000-4000-8000-000000000002
 SID_GONE=33333333-0000-4000-8000-000000000003
 SID_SPECIAL=44444444-0000-4000-8000-000000000004
+SID_REMOVED=55555555-0000-4000-8000-000000000005
 
 export CLAUDE_CONFIG_DIR="$TMP/claude"
-mkdir -p "$CLAUDE_CONFIG_DIR/projects/encoded"
-for sid in "$SID_ALPHA" "$SID_BETA" "$SID_SPECIAL"; do
-  : >"$CLAUDE_CONFIG_DIR/projects/encoded/$sid.jsonl"
-done
-{
-  printf '{"display":"alpha work","timestamp":4000,"project":"%s","sessionId":"%s"}\n' "$ALPHA" "$SID_ALPHA"
-  printf '{"display":"beta work","timestamp":3000,"project":"%s","sessionId":"%s"}\n' "$PROJ/beta" "$SID_BETA"
-  printf '{"display":"deleted conversation","timestamp":2000,"project":"%s","sessionId":"%s"}\n' "$PROJ/alpha-other" "$SID_GONE"
-  printf '{"display":"special path","timestamp":1000,"project":"%s","sessionId":"%s"}\n' "$SPECIAL" "$SID_SPECIAL"
-  printf '{"display":"missing dir","timestamp":500,"project":"%s","sessionId":"%s"}\n' "$PROJ/removed" "$SID_ALPHA"
-} >"$CLAUDE_CONFIG_DIR/history.jsonl"
+
+# transcript_path SESSION CWD: where Claude Code stores the conversation.
+transcript_path() {
+  printf '%s/projects/%s/%s.jsonl\n' "$CLAUDE_CONFIG_DIR" \
+    "$(printf '%s' "$2" | LC_ALL=C sed 's/[^A-Za-z0-9]/-/g')" "$1"
+}
+
+# add_transcript SESSION CWD PROMPT
+add_transcript() {
+  local file
+  file=$(transcript_path "$1" "$2")
+  mkdir -p "$(dirname "$file")"
+  # shellcheck disable=SC2016  # jq variables
+  jq -nc --arg sid "$1" --arg cwd "$2" --arg prompt "$3" \
+    '{type: "user", sessionId: $sid, cwd: $cwd, timestamp: "2024-11-10T12:00:00.000Z",
+      origin: {kind: "human"}, message: {role: "user", content: $prompt}}' >"$file"
+}
+
+add_transcript "$SID_ALPHA" "$ALPHA" "alpha work"
+add_transcript "$SID_BETA" "$PROJ/beta" "beta work"
+add_transcript "$SID_GONE" "$PROJ/alpha-other" "deleted conversation"
+add_transcript "$SID_SPECIAL" "$SPECIAL" "special path"
+add_transcript "$SID_REMOVED" "$PROJ/removed" "missing dir"
+GONE_FILE=$(transcript_path "$SID_GONE" "$PROJ/alpha-other")
 
 # Start the private server; plugin scripts reach it through $TMUX.
 tm -f /dev/null new-session -d -s main -x 200 -y 50 -c "$PROJ/base"
@@ -292,17 +310,18 @@ test_case "handles deleted conversations and missing directories"
 S=$(new_session t-missing)
 rm -f "$CJ_TEST_CLAUDE_LOG"
 BEFORE=$(window_count "$S")
-OUT=$(pick ctrl-o "$SID_GONE" "$S" 2>&1)
+OUT=$(CJ_TEST_DELETE=$GONE_FILE pick ctrl-o "$SID_GONE" "$S" 2>&1)
 assert_eq "Ctrl-O on a deleted conversation adds no window" "$BEFORE" "$(window_count "$S")"
 assert_contains "Ctrl-O reports it" "no longer exists; cannot resume" "$OUT"
-OUT=$(pick "" "$SID_GONE" "$S" 2>&1)
+add_transcript "$SID_GONE" "$PROJ/alpha-other" "deleted conversation"
+OUT=$(CJ_TEST_DELETE=$GONE_FILE pick "" "$SID_GONE" "$S" 2>&1)
 W=$(active_window "$S")
 assert_eq "Enter falls back to a shell window" "$PROJ/alpha-other" "$(window_option "$W" @claude_jump_project)"
 assert_contains "Enter reports it" "opened a shell instead" "$OUT"
 sleep 0.3
 assert_eq "claude not started for a deleted conversation" "" "$(claude_calls)"
 BEFORE=$(window_count "$S")
-OUT=$(pick "" "$PROJ/removed" "$S" 2>&1)
+OUT=$(pick "" "$SID_REMOVED" "$S" 2>&1)
 assert_eq "missing directory adds no window" "$BEFORE" "$(window_count "$S")"
 assert_contains "missing directory is reported" "project directory not found" "$OUT"
 OUT=$(nav open "$S" "$PROJ/removed" 2>&1)

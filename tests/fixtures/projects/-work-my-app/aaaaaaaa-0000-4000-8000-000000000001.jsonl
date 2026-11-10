@@ -1,0 +1,15 @@
+{"type":"queue-operation","operation":"enqueue","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:00:00.000Z","isSidechain":false,"origin":{"kind":"human"},"message":{"role":"user","content":"Refactor the authentication module"}}
+{"type":"assistant","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:00:10.000Z","message":{"role":"assistant","content":[{"type":"text","text":"assistant reply text"}]}}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:00:30.000Z","isSidechain":false,"message":{"role":"user","content":[{"tool_use_id":"toolu_1","type":"tool_result","content":"tool output text"}]}}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:01:00.000Z","isMeta":true,"message":{"role":"user","content":"Caveat: injected meta text"}}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:01:00.500Z","message":{"role":"user","content":"<command-name>/login</command-name>\n<command-message>login</command-message>\n<command-args></command-args>"}}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:01:01.000Z","message":{"role":"user","content":"<local-command-stdout>Login successful</local-command-stdout>"}}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T12:30:00.000Z","isSidechain":true,"message":{"role":"user","content":"sidechain prompt text"}}
+{"type":"user","cwd":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T13:00:00.000Z","origin":{"kind":"task-notification"},"message":{"role":"user","content":"task notification text"}}
+{not valid json
+
+[1,2,3]
+{"type":"ai-title","aiTitle":"Auth refactor","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
+{"type":"user","cwd":"/work/my-app/src","sessionId":"aaaaaaaa-0000-4000-8000-000000000001","timestamp":"2024-11-10T14:30:00.000Z","origin":{"kind":"human"},"message":{"role":"user","content":[{"type":"text","text":"Also review the JWT expiry"},{"type":"image","source":{"type":"base64","data":""}}]}}
+{"type":"custom-title","customTitle":"Authentication refactoring","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
