@@ -1,0 +1,15 @@
+{"display":"認証機能のリファクタリング","pastedContents":{},"timestamp":1731240000000,"project":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
+{"display":"/login","pastedContents":{},"timestamp":1731240100000,"project":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
+{"display":"JWTの有効期限も見直して","pastedContents":{},"timestamp":1731249000000,"project":"/work/my-app","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
+{"display":"APIエラーハンドリングの改善","pastedContents":{},"timestamp":1731238000000,"project":"/work/backend","sessionId":"bbbbbbbb-0000-4000-8000-000000000002"}
+{not valid json
+{"display":"テストコードの追加","pastedContents":{},"timestamp":1731150000000,"project":"/work/my-app/","sessionId":"cccccccc-0000-4000-8000-000000000003"}
+
+{"display":"legacy entry without session id","pastedContents":{},"timestamp":1731100000000,"project":"/work/legacy"}
+{"display":"line1\nline2\tTAB \u0001ctl $(touch /tmp/cj-pwned) `id`; rm -rf ~ 'q' \"dq\" 日本語　全角","pastedContents":{},"timestamp":1731000000000,"project":"/work/My Project/space dir","sessionId":"dddddddd-0000-4000-8000-000000000004"}
+{"display":"unsafe session id","pastedContents":{},"timestamp":1731000000001,"project":"/work/evil","sessionId":"../../etc/passwd"}
+[1,2,3]
+{"display":"same id, other project","pastedContents":{},"timestamp":1730500000000,"project":"/work/other","sessionId":"aaaaaaaa-0000-4000-8000-000000000001"}
+{"display":"/clear","pastedContents":{},"timestamp":1730000000000,"project":"/work/website","sessionId":"ffffffff-0000-4000-8000-000000000006"}
+{"display":"string timestamp","pastedContents":{},"timestamp":"2024-11-01T00:00:00Z","project":"/work/bad-ts","sessionId":"eeeeeeee-0000-4000-8000-000000000005"}
+{"display":"relative project","pastedContents":{},"timestamp":1730000000001,"project":"work/relative","sessionId":"eeeeeeee-0000-4000-8000-000000000007"}
